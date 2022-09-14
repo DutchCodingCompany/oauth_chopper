@@ -17,7 +17,8 @@ class OAuthAuthenticator extends Authenticator {
   final OAuthChopper oauthChopper;
 
   @override
-  FutureOr<Request?> authenticate(Request request, Response<dynamic> response, [Request? originalRequest]) async {
+  FutureOr<Request?> authenticate(Request request, Response<dynamic> response,
+      [Request? originalRequest]) async {
     final token = await oauthChopper.token;
     if (response.statusCode == HttpStatus.unauthorized && token != null) {
       try {
