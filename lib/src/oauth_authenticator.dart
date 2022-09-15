@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:html';
 
 import 'package:chopper/chopper.dart';
 import 'package:oauth_chopper/oauth_chopper.dart';
