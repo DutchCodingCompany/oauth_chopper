@@ -1,3 +1,7 @@
+## 0.0.4
+
+- Removed import for HttpStatus because platform support
+
 ## 0.0.3
 
 - Changed import for HttpStatus

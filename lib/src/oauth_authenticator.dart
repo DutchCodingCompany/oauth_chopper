@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:html';
 
 import 'package:chopper/chopper.dart';
 import 'package:oauth_chopper/oauth_chopper.dart';
@@ -20,7 +19,7 @@ class OAuthAuthenticator extends Authenticator {
   FutureOr<Request?> authenticate(Request request, Response<dynamic> response,
       [Request? originalRequest]) async {
     final token = await oauthChopper.token;
-    if (response.statusCode == HttpStatus.unauthorized && token != null) {
+    if (response.statusCode == 401 && token != null) {
       try {
         final credentials = await oauthChopper.refresh();
         if (credentials != null) {
