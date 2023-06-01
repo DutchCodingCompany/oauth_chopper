@@ -7,7 +7,7 @@ environment:
   sdk: '>=2.17.0 <3.0.0'
 
 dependencies:
-  chopper: ^5.0.0
+  chopper: ^6.1.3
   oauth2: ^2.0.0
 
 dev_dependencies:
