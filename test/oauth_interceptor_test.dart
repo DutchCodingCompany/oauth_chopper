@@ -20,7 +20,7 @@ void main() {
     ),
   );
 
-  final testRequest = Request('GET', 'test', 'test');
+  final testRequest = Request('GET', Uri(host: 'test'), Uri(host: 'test'));
 
   test('HeaderInterceptor adds available token to headers', () async {
     // arrange
