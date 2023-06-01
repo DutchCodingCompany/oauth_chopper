@@ -1,3 +1,7 @@
+## 0.0.5
+
+- Update Chopper
+
 ## 0.0.4
 
 - Removed import for HttpStatus because platform support
