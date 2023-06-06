@@ -43,13 +43,13 @@ class ClientCredentialsGrant extends OAuthGrant {
 
 /// Obtains credentials using a [authorization code grant](https://tools.ietf.org/html/rfc6749#section-1.3.1).
 class AuthorizationCodeGrant extends OAuthGrant {
-  const AuthorizationCodeGrant(
-    this.tokenEndpoint,
-    this.scopes,
-    this.redirectUrl,
-    this.redirect,
-    this.listen,
-  );
+  const AuthorizationCodeGrant({
+    required this.tokenEndpoint,
+    required this.scopes,
+    required this.redirectUrl,
+    required this.redirect,
+    required this.listen,
+  });
 
   final Uri tokenEndpoint;
   final Uri redirectUrl;
