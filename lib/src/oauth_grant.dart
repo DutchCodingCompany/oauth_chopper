@@ -45,4 +45,37 @@ class ClientCredentialsGrant extends OAuthGrant {
   }
 }
 
-//TODO: Add AuthorizationCodeGrant
+/// Obtains credentials using a [authorization code grant](https://tools.ietf.org/html/rfc6749#section-1.3.1).
+class AuthorizationCodeGrant extends OAuthGrant {
+  const AuthorizationCodeGrant({
+    required this.tokenEndpoint,
+    required this.scopes,
+    required this.redirectUrl,
+    required this.redirect,
+    required this.listen,
+  });
+
+  final Uri tokenEndpoint;
+  final Uri redirectUrl;
+  final List<String> scopes;
+  final Future<void> Function(Uri authorizationUri) redirect;
+  final Future<Uri> Function(Uri redirectUri) listen;
+
+  @override
+  Future<String> handle(
+      Uri authorizationEndpoint, String identifier, String secret) async {
+    final grant = oauth.AuthorizationCodeGrant(
+      identifier,
+      authorizationEndpoint,
+      tokenEndpoint,
+    );
+    var authorizationUrl =
+        grant.getAuthorizationUrl(redirectUrl, scopes: scopes);
+    await redirect(authorizationUrl);
+    var responseUrl = await listen(redirectUrl);
+    oauth.Client client =
+        await grant.handleAuthorizationResponse(responseUrl.queryParameters);
+
+    return client.credentials.toJson();
+  }
+}
