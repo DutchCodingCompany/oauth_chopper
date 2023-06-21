@@ -28,7 +28,7 @@ This can be override by providing a custom storage implementation.
 
 - ✅ ResourceOwnerPasswordGrant
 - ✅ ClientCredentialsGrant
-- ❌ AuthorizationCodeGrant (*TODO*)
+- ✅ AuthorizationCodeGrant
 
 ## Usage
 
@@ -61,6 +61,15 @@ Example:
       username: 'username',
       password: 'password',
     ),
+  );
+
+// Authorization Cod eGrant
+  oauth_chopper.AuthorizationCodeGrant grant = oauth_chopper.AuthorizationCodeGrant(
+    tokenEndpoint: Uri.parse("tokenEndpoint"),
+    scopes: ["scope1", "scope2"],
+    redirectUrl: Uri.parse("redirectUrl"),
+    redirect: redirect,
+    listen: listen,
   );
 ```   
 
