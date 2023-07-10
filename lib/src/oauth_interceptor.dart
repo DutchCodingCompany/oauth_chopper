@@ -16,6 +16,6 @@ class OAuthInterceptor extends RequestInterceptor {
   FutureOr<Request> onRequest(Request request) async {
     final token = await oauthChopper.token;
     if (token == null) return request;
-    return request.addAuthorizationHeader(token.accessToken);
+    return request.addAuthorizationHeader(token.idToken ?? token.accessToken);
   }
 }

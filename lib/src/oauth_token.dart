@@ -4,14 +4,18 @@ class OAuthToken {
   final String accessToken;
   final String? refreshToken;
   final DateTime? expiration;
+  final String? idToken;
 
-  bool get isExpired =>
-      expiration != null && DateTime.now().isAfter(expiration!);
+  bool get isExpired {
+    bool expired = expiration != null && DateTime.now().isAfter(expiration!);
+    return expired;
+  }
 
   const OAuthToken._(
     this.accessToken,
     this.refreshToken,
     this.expiration,
+    this.idToken,
   );
 
   factory OAuthToken.fromJson(String json) {
@@ -23,5 +27,6 @@ class OAuthToken {
         credentials.accessToken,
         credentials.refreshToken,
         credentials.expiration,
+        credentials.idToken,
       );
 }
