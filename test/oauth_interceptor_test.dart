@@ -20,6 +20,16 @@ void main() {
     ),
   );
 
+  final testIDtoken = OAuthToken.fromCredentials(
+    Credentials(
+      'token',
+      refreshToken: 'refresh',
+      idToken: 'idToken',
+      expiration: DateTime(2022, 9, 1),
+    ),
+  );
+
+
   final testRequest = Request('GET', Uri(host: 'test'), Uri(host: 'test'));
 
   test('HeaderInterceptor adds available token to headers', () async {
@@ -34,6 +44,20 @@ void main() {
     // assert
     expect(result.headers, expected);
   });
+
+  test('HeaderInterceptor adds IDToken when available to headers', () async {
+    // arrange
+    when(mockOAuthChopper.token).thenAnswer((_) async => testIDtoken);
+    final interceptor = OAuthInterceptor(mockOAuthChopper);
+    final expected = {'Authorization': 'Bearer idToken'};
+
+    // act
+    final result = await interceptor.onRequest(testRequest);
+
+    // assert
+    expect(result.headers, expected);
+  });
+
   test('HeaderInterceptor adds no token to headers', () async {
     // arrange
     when(mockOAuthChopper.token).thenAnswer((_) async => null);
