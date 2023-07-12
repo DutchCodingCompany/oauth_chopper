@@ -4,7 +4,6 @@ import 'package:mockito/mockito.dart';
 import 'package:oauth2/oauth2.dart';
 import 'package:oauth_chopper/oauth_chopper.dart';
 import 'package:oauth_chopper/src/oauth_interceptor.dart';
-import 'package:oauth_chopper/src/oauth_token.dart';
 import 'package:test/test.dart';
 
 @GenerateMocks([OAuthChopper])
@@ -29,7 +28,6 @@ void main() {
     ),
   );
 
-
   final testRequest = Request('GET', Uri(host: 'test'), Uri(host: 'test'));
 
   test('HeaderInterceptor adds available token to headers', () async {
@@ -45,11 +43,11 @@ void main() {
     expect(result.headers, expected);
   });
 
-  test('HeaderInterceptor adds IDToken when available to headers', () async {
+  test('HeaderInterceptor does not add IDToken when available to headers', () async {
     // arrange
     when(mockOAuthChopper.token).thenAnswer((_) async => testIDtoken);
     final interceptor = OAuthInterceptor(mockOAuthChopper);
-    final expected = {'Authorization': 'Bearer idToken'};
+    final expected = {'Authorization': 'Bearer token'};
 
     // act
     final result = await interceptor.onRequest(testRequest);
