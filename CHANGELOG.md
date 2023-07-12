@@ -1,3 +1,7 @@
+## 0.1.2
+
+- Add ID token to OAuth token
+
 ## 0.1.1
 
 - Export OauthToken class
