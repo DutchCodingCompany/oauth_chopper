@@ -1,3 +1,9 @@
+## 0.2.0
+
+- Updated dependencies to latest versions. Including `chopper: 7.0.4` and `http: 1.1.0`.
+- Added basic github action checks.
+- Removed mockito in favor of mocktail.
+
 ## 0.1.2
 
 - Add ID token to OAuth token

@@ -17,7 +17,7 @@ void main() {
 
   /// Add the oauth authenticator and interceptor to the chopper client.
   final chopperClient = ChopperClient(
-    baseUrl: Uri(host: 'https://example.com'),
+    baseUrl: Uri.parse('https://example.com'),
     authenticator: oauthChopper.authenticator(),
     interceptors: [
       oauthChopper.interceptor,
