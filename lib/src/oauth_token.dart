@@ -6,7 +6,8 @@ class OAuthToken {
   final DateTime? expiration;
   final String? idToken;
 
-  bool get isExpired => expiration != null && DateTime.now().isAfter(expiration!);
+  bool get isExpired =>
+      expiration != null && DateTime.now().isAfter(expiration!);
 
   const OAuthToken._(
     this.accessToken,

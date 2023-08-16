@@ -30,7 +30,7 @@ void main() {
 
   test('HeaderInterceptor adds available token to headers', () async {
     // arrange
-    when(()=>mockOAuthChopper.token).thenAnswer((_) async => testToken);
+    when(() => mockOAuthChopper.token).thenAnswer((_) async => testToken);
     final interceptor = OAuthInterceptor(mockOAuthChopper);
     final expected = {'Authorization': 'Bearer token'};
 
@@ -41,9 +41,10 @@ void main() {
     expect(result.headers, expected);
   });
 
-  test('HeaderInterceptor does not add IDToken when available to headers', () async {
+  test('HeaderInterceptor does not add IDToken when available to headers',
+      () async {
     // arrange
-    when(()=>mockOAuthChopper.token).thenAnswer((_) async => testIDtoken);
+    when(() => mockOAuthChopper.token).thenAnswer((_) async => testIDtoken);
     final interceptor = OAuthInterceptor(mockOAuthChopper);
     final expected = {'Authorization': 'Bearer token'};
 
@@ -56,7 +57,7 @@ void main() {
 
   test('HeaderInterceptor adds no token to headers', () async {
     // arrange
-    when(()=>mockOAuthChopper.token).thenAnswer((_) async => null);
+    when(() => mockOAuthChopper.token).thenAnswer((_) async => null);
     final interceptor = OAuthInterceptor(mockOAuthChopper);
     final expected = {};
 

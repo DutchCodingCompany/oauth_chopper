@@ -21,8 +21,10 @@ void main() {
     ),
   );
   final testRequest = Request('GET', Uri.parse('test'), Uri.parse('test'));
-  final unauthorizedResponse = Response(http.Response('body', HttpStatus.unauthorized), 'body');
-  final authorizedResponse = Response(http.Response('body', HttpStatus.accepted), 'body');
+  final unauthorizedResponse =
+      Response(http.Response('body', HttpStatus.unauthorized), 'body');
+  final authorizedResponse =
+      Response(http.Response('body', HttpStatus.accepted), 'body');
 
   test('only refresh on unauthorized and token', () async {
     // arrange
@@ -32,7 +34,8 @@ void main() {
     final expected = {'Authorization': 'Bearer token'};
 
     // act
-    final result = await authenticator.authenticate(testRequest, unauthorizedResponse);
+    final result =
+        await authenticator.authenticate(testRequest, unauthorizedResponse);
 
     // assert
     verify(() => mockOAuthChopper.refresh()).called(1);
@@ -46,7 +49,8 @@ void main() {
     final authenticator = OAuthAuthenticator(mockOAuthChopper, null);
 
     // act
-    final result = await authenticator.authenticate(testRequest, authorizedResponse);
+    final result =
+        await authenticator.authenticate(testRequest, authorizedResponse);
 
     // assert
     verifyNever(() => mockOAuthChopper.refresh());
@@ -60,7 +64,8 @@ void main() {
     final authenticator = OAuthAuthenticator(mockOAuthChopper, null);
 
     // act
-    final result = await authenticator.authenticate(testRequest, unauthorizedResponse);
+    final result =
+        await authenticator.authenticate(testRequest, unauthorizedResponse);
 
     // assert
     verifyNever(() => mockOAuthChopper.refresh());
@@ -74,7 +79,8 @@ void main() {
     final authenticator = OAuthAuthenticator(mockOAuthChopper, null);
 
     // act
-    final result = await authenticator.authenticate(testRequest, unauthorizedResponse);
+    final result =
+        await authenticator.authenticate(testRequest, unauthorizedResponse);
 
     // assert
     verify(() => mockOAuthChopper.refresh()).called(1);
@@ -89,7 +95,10 @@ void main() {
 
     // act
     // assert
-    expect(() async => await authenticator.authenticate(testRequest, unauthorizedResponse), throwsFormatException);
+    expect(
+        () async =>
+            await authenticator.authenticate(testRequest, unauthorizedResponse),
+        throwsFormatException);
   });
 
   test("Exception not thrown if onError is supplied", () async {
@@ -97,10 +106,12 @@ void main() {
     FormatException? result;
     when(() => mockOAuthChopper.refresh()).thenThrow(FormatException('failed'));
     when(() => mockOAuthChopper.token).thenAnswer((_) async => testToken);
-    final authenticator = OAuthAuthenticator(mockOAuthChopper, (e, s) => result = e as FormatException);
+    final authenticator = OAuthAuthenticator(
+        mockOAuthChopper, (e, s) => result = e as FormatException);
 
     // act
-    final responseResult = await authenticator.authenticate(testRequest, unauthorizedResponse);
+    final responseResult =
+        await authenticator.authenticate(testRequest, unauthorizedResponse);
 
     // assert
     expect(result?.message, 'failed');
