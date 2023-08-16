@@ -4,6 +4,22 @@
 - Added basic github action checks.
 - Removed mockito in favor of mocktail.
 
+## 0.1.2
+
+- Add ID token to OAuth token
+
+## 0.1.1
+
+- Export OauthToken class
+
+## 0.1.0
+
+- Add support for AuthorizationCodeGrant
+
+## 0.0.5
+
+- Update Chopper
+
 ## 0.0.4
 
 - Removed import for HttpStatus because platform support

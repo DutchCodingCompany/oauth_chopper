@@ -17,7 +17,7 @@ void main() {
    {
  	"accessToken": "accesToken",
  	"refreshToken": "refreshToken",
- 	"idToken": null,
+ 	"idToken": "idToken",
  	"tokenEndpoint": "https://test.test/oauth/token",
  	"scopes": [],
  	"expiration": 1664359530234
@@ -60,6 +60,7 @@ void main() {
     // assert
     expect(token?.accessToken, 'accesToken');
     expect(token?.refreshToken, 'refreshToken');
+    expect(token?.idToken, 'idToken');
   });
 
   test('Returns no token if not in storage', () async {
@@ -89,6 +90,7 @@ void main() {
     verify(() => grantMock.handle(any(), 'identifier', 'secret')).called(1);
     verify(() => storageMock.saveCredentials(testJson)).called(1);
     expect(token.accessToken, 'accesToken');
+    expect(token?.idToken, 'idToken');
     expect(token.refreshToken, 'refreshToken');
   });
 }
