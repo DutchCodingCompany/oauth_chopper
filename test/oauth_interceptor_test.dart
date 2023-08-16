@@ -1,14 +1,12 @@
 import 'package:chopper/chopper.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:oauth2/oauth2.dart';
 import 'package:oauth_chopper/oauth_chopper.dart';
 import 'package:oauth_chopper/src/oauth_interceptor.dart';
 import 'package:oauth_chopper/src/oauth_token.dart';
 import 'package:test/test.dart';
 
-@GenerateMocks([OAuthChopper])
-import 'oauth_interceptor_test.mocks.dart';
+class MockOAuthChopper extends Mock implements OAuthChopper {}
 
 void main() {
   final mockOAuthChopper = MockOAuthChopper();
@@ -20,11 +18,11 @@ void main() {
     ),
   );
 
-  final testRequest = Request('GET', 'test', 'test');
+  final testRequest = Request('GET', Uri.parse('test'), Uri.parse('test'));
 
   test('HeaderInterceptor adds available token to headers', () async {
     // arrange
-    when(mockOAuthChopper.token).thenAnswer((_) async => testToken);
+    when(()=>mockOAuthChopper.token).thenAnswer((_) async => testToken);
     final interceptor = OAuthInterceptor(mockOAuthChopper);
     final expected = {'Authorization': 'Bearer token'};
 
@@ -36,7 +34,7 @@ void main() {
   });
   test('HeaderInterceptor adds no token to headers', () async {
     // arrange
-    when(mockOAuthChopper.token).thenAnswer((_) async => null);
+    when(()=>mockOAuthChopper.token).thenAnswer((_) async => null);
     final interceptor = OAuthInterceptor(mockOAuthChopper);
     final expected = {};
 
