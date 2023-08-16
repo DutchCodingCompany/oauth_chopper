@@ -43,7 +43,7 @@ void main() {
 
   test('HeaderInterceptor does not add IDToken when available to headers', () async {
     // arrange
-    when(mockOAuthChopper.token).thenAnswer((_) async => testIDtoken);
+    when(()=>mockOAuthChopper.token).thenAnswer((_) async => testIDtoken);
     final interceptor = OAuthInterceptor(mockOAuthChopper);
     final expected = {'Authorization': 'Bearer token'};
 
