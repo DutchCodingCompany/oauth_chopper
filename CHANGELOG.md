@@ -1,4 +1,4 @@
-## 0.1.0
+## 0.2.0
 
 - Updated dependencies to latest versions. Including `chopper: 7.0.4` and `http: 1.1.0`.
 - Added basic github action checks.
