@@ -75,7 +75,8 @@ class OAuthChopper {
     if (credentialsJson == null) return null;
     final credentials = Credentials.fromJson(credentialsJson);
     try {
-      final newCredentials = await credentials.refresh(identifier: identifier, secret: secret);
+      final newCredentials =
+          await credentials.refresh(identifier: identifier, secret: secret);
       await _storage.saveCredentials(newCredentials.toJson());
       return OAuthToken.fromCredentials(newCredentials);
     } on AuthorizationException {
