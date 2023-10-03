@@ -68,7 +68,8 @@ class OAuthChopper {
   OAuthInterceptor get interceptor => OAuthInterceptor(this);
 
   /// Tries to refresh the available credentials and returns a new [OAuthToken] instance.
-  /// Throws an exception when refreshing fails. See [Credentials.refresh]
+  /// Throws an exception when refreshing fails. If the exception is a [AuthorizationException] it clears the storage.
+  /// See [Credentials.refresh]
   Future<OAuthToken?> refresh() async {
     final credentialsJson = await _storage.fetchCredentials();
     if (credentialsJson == null) return null;
@@ -78,7 +79,7 @@ class OAuthChopper {
           await credentials.refresh(identifier: identifier, secret: secret);
       await _storage.saveCredentials(newCredentials.toJson());
       return OAuthToken.fromCredentials(newCredentials);
-    } catch (e) {
+    } on AuthorizationException {
       _storage.clear();
       rethrow;
     }
