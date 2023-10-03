@@ -1,3 +1,6 @@
+## 0.3.0
+- Fixed issues where credentials where cleared when refreshing token failed on other errors than authorization errors. 
+
 ## 0.2.0
 
 - Updated dependencies to latest versions. Including `chopper: 7.0.4` and `http: 1.1.0`.
