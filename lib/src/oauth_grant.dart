@@ -1,10 +1,15 @@
+import 'package:http/http.dart' as http;
 import 'package:oauth2/oauth2.dart' as oauth;
 
 abstract class OAuthGrant {
   const OAuthGrant();
 
   Future<String> handle(
-      Uri authorizationEndpoint, String identifier, String secret);
+    Uri authorizationEndpoint,
+    String identifier,
+    String secret,
+    http.Client? httpClient,
+  );
 }
 
 /// Obtains credentials using a [resource owner password grant](https://tools.ietf.org/html/rfc6749#section-1.3.3).
@@ -12,18 +17,22 @@ class ResourceOwnerPasswordGrant extends OAuthGrant {
   final String username;
   final String password;
 
-  const ResourceOwnerPasswordGrant(
-      {required this.username, required this.password});
+  const ResourceOwnerPasswordGrant({required this.username, required this.password});
 
   @override
   Future<String> handle(
-      Uri authorizationEndpoint, String identifier, String secret) async {
+    Uri authorizationEndpoint,
+    String identifier,
+    String secret,
+    http.Client? httpClient,
+  ) async {
     final client = await oauth.resourceOwnerPasswordGrant(
       authorizationEndpoint,
       username,
       password,
       secret: secret,
       identifier: identifier,
+      httpClient: httpClient,
     );
     return client.credentials.toJson();
   }
@@ -35,11 +44,16 @@ class ClientCredentialsGrant extends OAuthGrant {
 
   @override
   Future<String> handle(
-      Uri authorizationEndpoint, String identifier, String secret) async {
+    Uri authorizationEndpoint,
+    String identifier,
+    String secret,
+    http.Client? httpClient,
+  ) async {
     final client = await oauth.clientCredentialsGrant(
       authorizationEndpoint,
       identifier,
       secret,
+      httpClient: httpClient,
     );
     return client.credentials.toJson();
   }
@@ -63,18 +77,21 @@ class AuthorizationCodeGrant extends OAuthGrant {
 
   @override
   Future<String> handle(
-      Uri authorizationEndpoint, String identifier, String secret) async {
+    Uri authorizationEndpoint,
+    String identifier,
+    String secret,
+    http.Client? httpClient,
+  ) async {
     final grant = oauth.AuthorizationCodeGrant(
       identifier,
       authorizationEndpoint,
       tokenEndpoint,
+      httpClient: httpClient,
     );
-    var authorizationUrl =
-        grant.getAuthorizationUrl(redirectUrl, scopes: scopes);
+    var authorizationUrl = grant.getAuthorizationUrl(redirectUrl, scopes: scopes);
     await redirect(authorizationUrl);
     var responseUrl = await listen(redirectUrl);
-    oauth.Client client =
-        await grant.handleAuthorizationResponse(responseUrl.queryParameters);
+    oauth.Client client = await grant.handleAuthorizationResponse(responseUrl.queryParameters);
 
     return client.credentials.toJson();
   }

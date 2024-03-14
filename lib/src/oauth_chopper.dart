@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:http/http.dart' as http;
 import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:oauth_chopper/src/oauth_authenticator.dart';
 import 'package:oauth_chopper/src/oauth_grant.dart';
@@ -36,11 +37,15 @@ class OAuthChopper {
   /// See [OAuthStorage] for more information.
   final OAuthStorage _storage;
 
+  /// Provide a custom [http.Client] which will be passed to [oauth2] and used for making new requests.
+  final http.Client? httpClient;
+
   OAuthChopper({
     required this.authorizationEndpoint,
     required this.identifier,
     required this.secret,
     this.endSessionEndpoint,
+    this.httpClient,
 
     /// OAuth storage for storing credentials.
     /// By default it will use a in memory storage [MemoryStorage]. For persisting the credentials implement a custom [OAuthStorage].
@@ -51,9 +56,7 @@ class OAuthChopper {
   /// Get stored [OAuthToken].
   Future<OAuthToken?> get token async {
     final credentialsJson = await _storage.fetchCredentials();
-    return credentialsJson != null
-        ? OAuthToken.fromJson(credentialsJson)
-        : null;
+    return credentialsJson != null ? OAuthToken.fromJson(credentialsJson) : null;
   }
 
   /// Provides an [OAuthAuthenticator] instance.
@@ -75,8 +78,11 @@ class OAuthChopper {
     if (credentialsJson == null) return null;
     final credentials = oauth2.Credentials.fromJson(credentialsJson);
     try {
-      final newCredentials =
-          await credentials.refresh(identifier: identifier, secret: secret);
+      final newCredentials = await credentials.refresh(
+        identifier: identifier,
+        secret: secret,
+        httpClient: httpClient,
+      );
       await _storage.saveCredentials(newCredentials.toJson());
       return OAuthToken.fromCredentials(newCredentials);
     } on oauth2.AuthorizationException {
@@ -92,8 +98,7 @@ class OAuthChopper {
   ///  - [AuthorizationCodeGrant]
   /// Throws an exception if the grant fails.
   Future<OAuthToken> requestGrant(OAuthGrant grant) async {
-    final credentials =
-        await grant.handle(authorizationEndpoint, identifier, secret);
+    final credentials = await grant.handle(authorizationEndpoint, identifier, secret, httpClient);
 
     await _storage.saveCredentials(credentials);
 
