@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:oauth2/oauth2.dart';
+import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:oauth_chopper/src/oauth_authenticator.dart';
 import 'package:oauth_chopper/src/oauth_grant.dart';
 import 'package:oauth_chopper/src/oauth_interceptor.dart';
@@ -73,13 +73,13 @@ class OAuthChopper {
   Future<OAuthToken?> refresh() async {
     final credentialsJson = await _storage.fetchCredentials();
     if (credentialsJson == null) return null;
-    final credentials = Credentials.fromJson(credentialsJson);
+    final credentials = oauth2.Credentials.fromJson(credentialsJson);
     try {
       final newCredentials =
           await credentials.refresh(identifier: identifier, secret: secret);
       await _storage.saveCredentials(newCredentials.toJson());
       return OAuthToken.fromCredentials(newCredentials);
-    } on AuthorizationException {
+    } on oauth2.AuthorizationException {
       _storage.clear();
       rethrow;
     }
@@ -89,7 +89,7 @@ class OAuthChopper {
   /// Currently supported grants:
   ///  - [ResourceOwnerPasswordGrant]
   ///  - [ClientCredentialsGrant]
-  ///
+  ///  - [AuthorizationCodeGrant]
   /// Throws an exception if the grant fails.
   Future<OAuthToken> requestGrant(OAuthGrant grant) async {
     final credentials =
