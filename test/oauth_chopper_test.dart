@@ -101,7 +101,8 @@ void main() {
     final token = await oauthChopper.requestGrant(grantMock);
 
     // assert
-    verify(() => grantMock.handle(any(), 'identifier', 'secret', null)).called(1);
+    verify(() => grantMock.handle(any(), 'identifier', 'secret', null))
+        .called(1);
     verify(() => storageMock.saveCredentials(testJson)).called(1);
     expect(token.accessToken, 'accesToken');
     expect(token.idToken, 'idToken');

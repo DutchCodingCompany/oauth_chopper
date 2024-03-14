@@ -17,7 +17,8 @@ class ResourceOwnerPasswordGrant extends OAuthGrant {
   final String username;
   final String password;
 
-  const ResourceOwnerPasswordGrant({required this.username, required this.password});
+  const ResourceOwnerPasswordGrant(
+      {required this.username, required this.password});
 
   @override
   Future<String> handle(
@@ -88,10 +89,12 @@ class AuthorizationCodeGrant extends OAuthGrant {
       tokenEndpoint,
       httpClient: httpClient,
     );
-    var authorizationUrl = grant.getAuthorizationUrl(redirectUrl, scopes: scopes);
+    var authorizationUrl =
+        grant.getAuthorizationUrl(redirectUrl, scopes: scopes);
     await redirect(authorizationUrl);
     var responseUrl = await listen(redirectUrl);
-    oauth.Client client = await grant.handleAuthorizationResponse(responseUrl.queryParameters);
+    oauth.Client client =
+        await grant.handleAuthorizationResponse(responseUrl.queryParameters);
 
     return client.credentials.toJson();
   }
