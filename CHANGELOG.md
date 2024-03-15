@@ -1,3 +1,8 @@
+## 0.4.0
+ - ✨ Add very good analysis by @Guldem in https://github.com/DutchCodingCompany/oauth_chopper/pull/17
+ - ✨ Add custom client by @Guldem in https://github.com/DutchCodingCompany/oauth_chopper/pull/18
+ - ⬆️ Upgraded some dependencies by @Guldem in https://github.com/DutchCodingCompany/oauth_chopper/pull/12
+
 ## 0.3.0
 - Fixed issues where credentials where cleared when refreshing token failed on other errors than authorization errors. 
 
