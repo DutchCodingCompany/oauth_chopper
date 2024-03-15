@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'package:oauth2/oauth2.dart' as oauth;
 
 /// {@template oauth_grant}
@@ -13,6 +14,7 @@ abstract interface class OAuthGrant {
     Uri authorizationEndpoint,
     String identifier,
     String secret,
+    http.Client? httpClient,
   );
 }
 
@@ -40,6 +42,7 @@ class ResourceOwnerPasswordGrant implements OAuthGrant {
     Uri authorizationEndpoint,
     String identifier,
     String secret,
+    http.Client? httpClient,
   ) async {
     final client = await oauth.resourceOwnerPasswordGrant(
       authorizationEndpoint,
@@ -47,6 +50,7 @@ class ResourceOwnerPasswordGrant implements OAuthGrant {
       password,
       secret: secret,
       identifier: identifier,
+      httpClient: httpClient,
     );
     return client.credentials.toJson();
   }
@@ -64,11 +68,13 @@ class ClientCredentialsGrant implements OAuthGrant {
     Uri authorizationEndpoint,
     String identifier,
     String secret,
+    http.Client? httpClient,
   ) async {
     final client = await oauth.clientCredentialsGrant(
       authorizationEndpoint,
       identifier,
       secret,
+      httpClient: httpClient,
     );
     return client.credentials.toJson();
   }
@@ -113,11 +119,13 @@ class AuthorizationCodeGrant implements OAuthGrant {
     Uri authorizationEndpoint,
     String identifier,
     String secret,
+    http.Client? httpClient,
   ) async {
     final grant = oauth.AuthorizationCodeGrant(
       identifier,
       authorizationEndpoint,
       tokenEndpoint,
+      httpClient: httpClient,
     );
 
     final authorizationUrl = grant.getAuthorizationUrl(
