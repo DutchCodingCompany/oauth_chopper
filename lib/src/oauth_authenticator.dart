@@ -20,6 +20,7 @@ class OAuthAuthenticator extends Authenticator {
 
   /// Callback for error handling.
   final OnErrorCallback? onError;
+
   /// The [OAuthChopper] instance to get the token from and
   /// to refresh the token.
   final OAuthChopper oauthChopper;

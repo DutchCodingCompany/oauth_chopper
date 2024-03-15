@@ -9,7 +9,11 @@ abstract interface class OAuthGrant {
   const OAuthGrant();
 
   /// Obtains credentials from an authorization server.
-  Future<String> handle(Uri authorizationEndpoint, String identifier, String secret);
+  Future<String> handle(
+    Uri authorizationEndpoint,
+    String identifier,
+    String secret,
+  );
 }
 
 /// {@template resource_owner_password_grant}
@@ -32,7 +36,11 @@ class ResourceOwnerPasswordGrant implements OAuthGrant {
   final String password;
 
   @override
-  Future<String> handle(Uri authorizationEndpoint, String identifier, String secret) async {
+  Future<String> handle(
+    Uri authorizationEndpoint,
+    String identifier,
+    String secret,
+  ) async {
     final client = await oauth.resourceOwnerPasswordGrant(
       authorizationEndpoint,
       username,
@@ -52,7 +60,11 @@ class ClientCredentialsGrant implements OAuthGrant {
   const ClientCredentialsGrant();
 
   @override
-  Future<String> handle(Uri authorizationEndpoint, String identifier, String secret) async {
+  Future<String> handle(
+    Uri authorizationEndpoint,
+    String identifier,
+    String secret,
+  ) async {
     final client = await oauth.clientCredentialsGrant(
       authorizationEndpoint,
       identifier,
@@ -88,9 +100,11 @@ class AuthorizationCodeGrant implements OAuthGrant {
   /// The specific permissions being requested from the authorization server may
   /// be specified via [scopes].
   final List<String> scopes;
+
   /// Callback used for redirect the authorizationUrl given by the authorization
   /// server.
   final Future<void> Function(Uri authorizationUri) redirect;
+
   /// Callback used for listening for the redirectUrl.
   final Future<Uri> Function(Uri redirectUri) listen;
 
@@ -114,7 +128,7 @@ class AuthorizationCodeGrant implements OAuthGrant {
     await redirect(authorizationUrl);
     final responseUrl = await listen(redirectUrl);
 
-    final oauth.Client client = await grant.handleAuthorizationResponse(
+    final client = await grant.handleAuthorizationResponse(
       responseUrl.queryParameters,
     );
 

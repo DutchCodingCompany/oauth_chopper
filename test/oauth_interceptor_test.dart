@@ -1,3 +1,6 @@
+// ignore so the test is easier to read.
+// ignore_for_file: avoid_redundant_argument_values
+
 import 'package:chopper/chopper.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:oauth2/oauth2.dart';

@@ -5,8 +5,10 @@ import 'package:oauth_chopper/oauth_chopper.dart';
 import 'package:oauth_chopper/src/extensions/request.dart';
 
 /// {@template oauth_interceptor}
-/// OAuthInterceptor is responsible for adding 'Authorization' header to requests.
-/// The header is only added if there is a token available. When no token is available no header is added.
+/// OAuthInterceptor is responsible for adding 'Authorization' header to
+/// requests.
+/// The header is only added if there is a token available. When no token is
+/// available no header is added.
 /// Its added as a Bearer token.
 /// {@endtemplate}
 class OAuthInterceptor implements RequestInterceptor {

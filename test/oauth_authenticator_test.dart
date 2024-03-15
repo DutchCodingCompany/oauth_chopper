@@ -1,3 +1,6 @@
+// ignore so the test is easier to read.
+// ignore_for_file: avoid_redundant_argument_values
+
 import 'dart:io';
 
 import 'package:chopper/chopper.dart';
@@ -28,7 +31,7 @@ void main() {
 
   test('only refresh on unauthorized and token', () async {
     // arrange
-    when(() => mockOAuthChopper.refresh()).thenAnswer((_) async => testToken);
+    when(mockOAuthChopper.refresh).thenAnswer((_) async => testToken);
     when(() => mockOAuthChopper.token).thenAnswer((_) async => testToken);
     final authenticator = OAuthAuthenticator(mockOAuthChopper, null);
     final expected = {'Authorization': 'Bearer token'};
@@ -38,13 +41,13 @@ void main() {
         await authenticator.authenticate(testRequest, unauthorizedResponse);
 
     // assert
-    verify(() => mockOAuthChopper.refresh()).called(1);
+    verify(mockOAuthChopper.refresh).called(1);
     expect(result?.headers, expected);
   });
 
   test("Don't refresh on authorized", () async {
     // arrange
-    when(() => mockOAuthChopper.refresh()).thenAnswer((_) async => testToken);
+    when(mockOAuthChopper.refresh).thenAnswer((_) async => testToken);
     when(() => mockOAuthChopper.token).thenAnswer((_) async => testToken);
     final authenticator = OAuthAuthenticator(mockOAuthChopper, null);
 
@@ -53,13 +56,13 @@ void main() {
         await authenticator.authenticate(testRequest, authorizedResponse);
 
     // assert
-    verifyNever(() => mockOAuthChopper.refresh());
+    verifyNever(mockOAuthChopper.refresh);
     expect(result, null);
   });
 
   test("Don't refresh on token not available", () async {
     // arrange
-    when(() => mockOAuthChopper.refresh()).thenAnswer((_) async => testToken);
+    when(mockOAuthChopper.refresh).thenAnswer((_) async => testToken);
     when(() => mockOAuthChopper.token).thenAnswer((_) async => null);
     final authenticator = OAuthAuthenticator(mockOAuthChopper, null);
 
@@ -68,13 +71,13 @@ void main() {
         await authenticator.authenticate(testRequest, unauthorizedResponse);
 
     // assert
-    verifyNever(() => mockOAuthChopper.refresh());
+    verifyNever(mockOAuthChopper.refresh);
     expect(result, null);
   });
 
   test("Don't add headers on failed refresh", () async {
     // arrange
-    when(() => mockOAuthChopper.refresh()).thenAnswer((_) async => null);
+    when(mockOAuthChopper.refresh).thenAnswer((_) async => null);
     when(() => mockOAuthChopper.token).thenAnswer((_) async => testToken);
     final authenticator = OAuthAuthenticator(mockOAuthChopper, null);
 
@@ -83,31 +86,34 @@ void main() {
         await authenticator.authenticate(testRequest, unauthorizedResponse);
 
     // assert
-    verify(() => mockOAuthChopper.refresh()).called(1);
+    verify(mockOAuthChopper.refresh).called(1);
     expect(result, null);
   });
 
-  test("Exception thrown if onError is null", () async {
+  test('Exception thrown if onError is null', () async {
     // arrange
-    when(() => mockOAuthChopper.refresh()).thenThrow(FormatException('failed'));
+    when(mockOAuthChopper.refresh).thenThrow(const FormatException('failed'));
     when(() => mockOAuthChopper.token).thenAnswer((_) async => testToken);
     final authenticator = OAuthAuthenticator(mockOAuthChopper, null);
 
     // act
     // assert
     expect(
-        () async =>
-            await authenticator.authenticate(testRequest, unauthorizedResponse),
-        throwsFormatException);
+      () async =>
+          await authenticator.authenticate(testRequest, unauthorizedResponse),
+      throwsFormatException,
+    );
   });
 
-  test("Exception not thrown if onError is supplied", () async {
+  test('Exception not thrown if onError is supplied', () async {
     // arrange
     FormatException? result;
-    when(() => mockOAuthChopper.refresh()).thenThrow(FormatException('failed'));
+    when(mockOAuthChopper.refresh).thenThrow(const FormatException('failed'));
     when(() => mockOAuthChopper.token).thenAnswer((_) async => testToken);
     final authenticator = OAuthAuthenticator(
-        mockOAuthChopper, (e, s) => result = e as FormatException);
+      mockOAuthChopper,
+      (e, s) => result = e as FormatException,
+    );
 
     // act
     final responseResult =
