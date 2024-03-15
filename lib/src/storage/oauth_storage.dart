@@ -1,6 +1,7 @@
 import 'dart:async';
 
-abstract class OAuthStorage {
+/// Interface for storage of OAuth credentials.
+abstract interface class OAuthStorage {
   const OAuthStorage();
 
   /// Fetch stored credentials.

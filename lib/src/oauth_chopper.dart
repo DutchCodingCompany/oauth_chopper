@@ -8,6 +8,7 @@ import 'package:oauth_chopper/src/oauth_token.dart';
 import 'package:oauth_chopper/src/storage/memory_storage.dart';
 import 'package:oauth_chopper/src/storage/oauth_storage.dart';
 
+/// {@template oauth_chopper}
 /// OAuthChopper client for configuring OAuth authentication with [Chopper].
 ///
 /// For example:
@@ -18,7 +19,21 @@ import 'package:oauth_chopper/src/storage/oauth_storage.dart';
 ///     secret: secret,
 ///   );
 /// ```
+/// {@endtemplate}
 class OAuthChopper {
+  /// {@macro oauth_chopper}
+  OAuthChopper({
+    required this.authorizationEndpoint,
+    required this.identifier,
+    required this.secret,
+    this.endSessionEndpoint,
+
+    /// OAuth storage for storing credentials.
+    /// By default it will use a in memory storage [MemoryStorage]. For persisting the credentials implement a custom [OAuthStorage].
+    /// See [OAuthStorage] for more information.
+    OAuthStorage? storage,
+  }) : _storage = storage ?? MemoryStorage();
+
   /// OAuth authorization endpoint.
   final Uri authorizationEndpoint;
 
@@ -36,24 +51,10 @@ class OAuthChopper {
   /// See [OAuthStorage] for more information.
   final OAuthStorage _storage;
 
-  OAuthChopper({
-    required this.authorizationEndpoint,
-    required this.identifier,
-    required this.secret,
-    this.endSessionEndpoint,
-
-    /// OAuth storage for storing credentials.
-    /// By default it will use a in memory storage [MemoryStorage]. For persisting the credentials implement a custom [OAuthStorage].
-    /// See [OAuthStorage] for more information.
-    OAuthStorage? storage,
-  }) : _storage = storage ?? MemoryStorage();
-
   /// Get stored [OAuthToken].
   Future<OAuthToken?> get token async {
     final credentialsJson = await _storage.fetchCredentials();
-    return credentialsJson != null
-        ? OAuthToken.fromJson(credentialsJson)
-        : null;
+    return credentialsJson != null ? OAuthToken.fromJson(credentialsJson) : null;
   }
 
   /// Provides an [OAuthAuthenticator] instance.
@@ -75,8 +76,7 @@ class OAuthChopper {
     if (credentialsJson == null) return null;
     final credentials = Credentials.fromJson(credentialsJson);
     try {
-      final newCredentials =
-          await credentials.refresh(identifier: identifier, secret: secret);
+      final newCredentials = await credentials.refresh(identifier: identifier, secret: secret);
       await _storage.saveCredentials(newCredentials.toJson());
       return OAuthToken.fromCredentials(newCredentials);
     } on AuthorizationException {
@@ -92,8 +92,7 @@ class OAuthChopper {
   ///
   /// Throws an exception if the grant fails.
   Future<OAuthToken> requestGrant(OAuthGrant grant) async {
-    final credentials =
-        await grant.handle(authorizationEndpoint, identifier, secret);
+    final credentials = await grant.handle(authorizationEndpoint, identifier, secret);
 
     await _storage.saveCredentials(credentials);
 

@@ -59,7 +59,7 @@ void main() {
     // arrange
     when(() => mockOAuthChopper.token).thenAnswer((_) async => null);
     final interceptor = OAuthInterceptor(mockOAuthChopper);
-    final expected = {};
+    final expected = <String, String>{};
 
     // act
     final result = await interceptor.onRequest(testRequest);
