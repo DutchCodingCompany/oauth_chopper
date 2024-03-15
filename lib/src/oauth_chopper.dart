@@ -55,13 +55,16 @@ class OAuthChopper {
   /// See [OAuthStorage] for more information.
   final OAuthStorage _storage;
 
-  /// Provide a custom [http.Client] which will be passed to [oauth2] and used for making new requests.
+  /// Provide a custom [http.Client] which will be passed to [oauth2] and used
+  /// for making new requests.
   final http.Client? httpClient;
 
   /// Get stored [OAuthToken].
   Future<OAuthToken?> get token async {
     final credentialsJson = await _storage.fetchCredentials();
-    return credentialsJson != null ? OAuthToken.fromJson(credentialsJson) : null;
+    return credentialsJson != null
+        ? OAuthToken.fromJson(credentialsJson)
+        : null;
   }
 
   /// Provides an [OAuthAuthenticator] instance.
@@ -69,7 +72,6 @@ class OAuthChopper {
   /// If [onError] is provided exceptions will be passed to [onError] and not be
   /// thrown.
   OAuthAuthenticator authenticator({
-    /// When provided [onError] handles exceptions if thrown.
     OnErrorCallback? onError,
   }) =>
       OAuthAuthenticator(this, onError);
@@ -80,9 +82,9 @@ class OAuthChopper {
   /// Tries to refresh the available credentials and returns a new [OAuthToken]
   /// instance.
   /// Throws an exception when refreshing fails. If the exception is a
-  /// [AuthorizationException] it clears the storage.
-  /// See [Credentials.refresh]
-  Future<OAuthToken?> refresh() async  {
+  /// [oauth2.AuthorizationException] it clears the storage.
+  /// See [oauth2.Credentials.refresh]
+  Future<OAuthToken?> refresh() async {
     final credentialsJson = await _storage.fetchCredentials();
     if (credentialsJson == null) return null;
     final credentials = oauth2.Credentials.fromJson(credentialsJson);
@@ -110,7 +112,11 @@ class OAuthChopper {
   /// Throws an exception if the grant fails.
   Future<OAuthToken> requestGrant(OAuthGrant grant) async {
     final credentials = await grant.handle(
-        authorizationEndpoint, identifier, secret, httpClient,);
+      authorizationEndpoint,
+      identifier,
+      secret,
+      httpClient,
+    );
 
     await _storage.saveCredentials(credentials);
 
