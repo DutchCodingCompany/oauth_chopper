@@ -4,20 +4,33 @@ import 'package:chopper/chopper.dart';
 import 'package:oauth_chopper/oauth_chopper.dart';
 import 'package:oauth_chopper/src/extensions/request.dart';
 
+/// Callback for error handling.
 typedef OnErrorCallback = void Function(Object, StackTrace);
 
-/// OAuthAuthenticator provides a authenticator that handles OAuth authorizations.
+/// {@template authenticator}
+/// OAuthAuthenticator provides a authenticator that handles
+/// OAuth authorizations.
 /// When the provided credentials are invalid it tries to refresh them.
-/// Can throw a exceptions if no [onError] is passed. When [onError] is passed exception will be passed to [onError]
+/// Can throw a exceptions if no [onError] is passed. When [onError] is passed
+/// exception will be passed to [onError]
+/// {@endtemplate}
 class OAuthAuthenticator extends Authenticator {
+  /// {@macro authenticator}
   OAuthAuthenticator(this.oauthChopper, this.onError);
 
+  /// Callback for error handling.
   final OnErrorCallback? onError;
+
+  /// The [OAuthChopper] instance to get the token from and
+  /// to refresh the token.
   final OAuthChopper oauthChopper;
 
   @override
-  FutureOr<Request?> authenticate(Request request, Response<dynamic> response,
-      [Request? originalRequest]) async {
+  FutureOr<Request?> authenticate(
+    Request request,
+    Response<dynamic> response, [
+    Request? originalRequest,
+  ]) async {
     final token = await oauthChopper.token;
     if (response.statusCode == 401 && token != null) {
       try {

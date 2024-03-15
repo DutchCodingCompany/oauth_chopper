@@ -1,4 +1,4 @@
-/// OAuthChopper for configuring OAuth authentication with [Chopper].
+/// OAuthChopper for configuring OAuth authentication with Chopper.
 ///
 /// More dartdocs go here.
 library oauth_chopper;

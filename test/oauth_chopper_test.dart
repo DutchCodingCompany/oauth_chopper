@@ -13,7 +13,7 @@ void main() {
 
   final storageMock = MockOAuthStorage();
   final grantMock = MockOAuthGrant();
-  final testJson = '''
+  const testJson = '''
    {
  	"accessToken": "accesToken",
  	"refreshToken": "refreshToken",
@@ -27,9 +27,10 @@ void main() {
   test('oauth_chopper returns interceptor which contains oauth_chopper', () {
     // arrange
     final oauthChopper = OAuthChopper(
-        authorizationEndpoint: Uri.parse('endpoint'),
-        identifier: 'identifier',
-        secret: 'secret');
+      authorizationEndpoint: Uri.parse('endpoint'),
+      identifier: 'identifier',
+      secret: 'secret',
+    );
 
     // act
     final inteceptor = oauthChopper.interceptor;
@@ -41,9 +42,10 @@ void main() {
   test('oauth_chopper returns authenticator which contains oauth_chopper', () {
     // arrange
     final oauthChopper = OAuthChopper(
-        authorizationEndpoint: Uri.parse('endpoint'),
-        identifier: 'identifier',
-        secret: 'secret');
+      authorizationEndpoint: Uri.parse('endpoint'),
+      identifier: 'identifier',
+      secret: 'secret',
+    );
 
     // act
     final authenticator = oauthChopper.authenticator();
@@ -54,12 +56,13 @@ void main() {
 
   test('Returns token from storage', () async {
     // arrange
-    when(() => storageMock.fetchCredentials()).thenAnswer((_) => testJson);
+    when(storageMock.fetchCredentials).thenAnswer((_) => testJson);
     final oauthChopper = OAuthChopper(
-        authorizationEndpoint: Uri.parse('endpoint'),
-        identifier: 'identifier',
-        secret: 'secret',
-        storage: storageMock);
+      authorizationEndpoint: Uri.parse('endpoint'),
+      identifier: 'identifier',
+      secret: 'secret',
+      storage: storageMock,
+    );
 
     // act
     final token = await oauthChopper.token;
@@ -72,12 +75,13 @@ void main() {
 
   test('Returns no token if not in storage', () async {
     // arrange
-    when(() => storageMock.fetchCredentials()).thenAnswer((_) => null);
+    when(storageMock.fetchCredentials).thenAnswer((_) => null);
     final oauthChopper = OAuthChopper(
-        authorizationEndpoint: Uri.parse('endpoint'),
-        identifier: 'identifier',
-        secret: 'secret',
-        storage: storageMock);
+      authorizationEndpoint: Uri.parse('endpoint'),
+      identifier: 'identifier',
+      secret: 'secret',
+      storage: storageMock,
+    );
 
     // act
     final token = await oauthChopper.token;
@@ -86,16 +90,17 @@ void main() {
     expect(token, null);
   });
 
-  test("Successful grant is stored", () async {
+  test('Successful grant is stored', () async {
     // arrange
     when(() => storageMock.saveCredentials(any())).thenAnswer((_) => null);
     when(() => grantMock.handle(any(), any(), any(), null))
         .thenAnswer((_) async => testJson);
     final oauthChopper = OAuthChopper(
-        authorizationEndpoint: Uri.parse('endpoint'),
-        identifier: 'identifier',
-        secret: 'secret',
-        storage: storageMock);
+      authorizationEndpoint: Uri.parse('endpoint'),
+      identifier: 'identifier',
+      secret: 'secret',
+      storage: storageMock,
+    );
 
     // act
     final token = await oauthChopper.requestGrant(grantMock);
