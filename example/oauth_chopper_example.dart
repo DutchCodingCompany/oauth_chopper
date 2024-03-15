@@ -1,4 +1,6 @@
-// ignore_for_file: unused_local_variable
+// ignore because its a example.
+// ignore_for_file: unused_local_variable, prefer_const_declarations,
+// ignore_for_file: prefer_const_constructors
 
 import 'package:chopper/chopper.dart';
 import 'package:oauth_chopper/oauth_chopper.dart';
