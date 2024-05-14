@@ -1,3 +1,7 @@
+## 1.0.0
+ - Updated chopper to v8.0.0
+ - **BREAKING** Removed oauth_chopper authenticator. Now only the interceptor is needed.
+
 ## 0.3.0
 - Fixed issues where credentials where cleared when refreshing token failed on other errors than authorization errors. 
 

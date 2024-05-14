@@ -33,7 +33,7 @@ This can be override by providing a custom storage implementation.
 ## Usage
 
 Create a `oauth_chopper` client with the needed authorizationEndpoint, identifier and secret.  
-Add the `oauth_chopper_authenticator` + `oauth_chopper_interceptor` to your chopper client.  
+Add the `oauth_chopper_interceptor` to your chopper client.  
 Request a OAuthGrant on the `oauth_chopper` client.
 
 Example:
@@ -49,7 +49,6 @@ Example:
   /// Add the oauth authenticator and interceptor to the chopper client.
   final chopperClient = ChopperClient(
     baseUrl: Uri.parse('https://example.com'),
-    authenticator: oauthChopper.authenticator(),
     interceptors: [
       oauthChopper.interceptor,
     ],

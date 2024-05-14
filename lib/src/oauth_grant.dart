@@ -4,6 +4,12 @@ import 'package:oauth2/oauth2.dart' as oauth;
 /// {@template oauth_grant}
 /// Interface for a OAuth grant.
 /// Grants are used to obtain credentials from an authorization server.
+///
+/// Currently available grants:
+/// - [ResourceOwnerPasswordGrant]
+/// - [ClientCredentialsGrant]
+/// - [AuthorizationCodeGrant]
+///
 /// {@endtemplate}
 abstract interface class OAuthGrant {
   /// {@macro oauth_grant}
