@@ -33,26 +33,12 @@ void main() {
     );
 
     // act
-    final inteceptor = oauthChopper.interceptor;
+    final inteceptor = oauthChopper.interceptor();
 
     // assert
     expect(oauthChopper, inteceptor.oauthChopper);
   });
 
-  test('oauth_chopper returns authenticator which contains oauth_chopper', () {
-    // arrange
-    final oauthChopper = OAuthChopper(
-      authorizationEndpoint: Uri.parse('endpoint'),
-      identifier: 'identifier',
-      secret: 'secret',
-    );
-
-    // act
-    final authenticator = oauthChopper.authenticator();
-
-    // assert
-    expect(oauthChopper, authenticator.oauthChopper);
-  });
 
   test('Returns token from storage', () async {
     // arrange

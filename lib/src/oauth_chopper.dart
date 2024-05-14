@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:http/http.dart' as http;
 import 'package:oauth2/oauth2.dart' as oauth2;
-import 'package:oauth_chopper/src/oauth_authenticator.dart';
 import 'package:oauth_chopper/src/oauth_grant.dart';
 import 'package:oauth_chopper/src/oauth_interceptor.dart';
 import 'package:oauth_chopper/src/oauth_token.dart';
@@ -62,22 +61,14 @@ class OAuthChopper {
   /// Get stored [OAuthToken].
   Future<OAuthToken?> get token async {
     final credentialsJson = await _storage.fetchCredentials();
-    return credentialsJson != null
-        ? OAuthToken.fromJson(credentialsJson)
-        : null;
+    return credentialsJson != null ? OAuthToken.fromJson(credentialsJson) : null;
   }
 
-  /// Provides an [OAuthAuthenticator] instance.
-  /// The authenticator can throw exceptions when OAuth authentication fails.
-  /// If [onError] is provided exceptions will be passed to [onError] and not be
-  /// thrown.
-  OAuthAuthenticator authenticator({
+  /// Provides an [OAuthInterceptor] instance.
+  OAuthInterceptor interceptor({
     OnErrorCallback? onError,
   }) =>
-      OAuthAuthenticator(this, onError);
-
-  /// Provides an [OAuthInterceptor] instance.
-  OAuthInterceptor get interceptor => OAuthInterceptor(this);
+      OAuthInterceptor(this, onError);
 
   /// Tries to refresh the available credentials and returns a new [OAuthToken]
   /// instance.
