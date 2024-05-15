@@ -65,6 +65,8 @@ class OAuthChopper {
   }
 
   /// Provides an [OAuthInterceptor] instance.
+  /// If [onError] is provided exceptions will be passed to [onError] and not be
+  /// thrown.
   OAuthInterceptor interceptor({
     OnErrorCallback? onError,
   }) =>

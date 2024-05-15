@@ -50,7 +50,7 @@ Example:
   final chopperClient = ChopperClient(
     baseUrl: Uri.parse('https://example.com'),
     interceptors: [
-      oauthChopper.interceptor,
+      oauthChopper.interceptor(),
     ],
   );
 
