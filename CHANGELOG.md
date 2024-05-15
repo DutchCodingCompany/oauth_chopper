@@ -1,3 +1,7 @@
+## 1.0.0
+ - Updated chopper to v8.0.0
+ - **BREAKING** Removed oauth_chopper authenticator. Now only the interceptor is needed.
+
 ## 0.4.0
  - ✨ Add very good analysis by @Guldem in https://github.com/DutchCodingCompany/oauth_chopper/pull/17
  - ✨ Add custom client by @Guldem in https://github.com/DutchCodingCompany/oauth_chopper/pull/18
