@@ -61,7 +61,9 @@ class OAuthChopper {
   /// Get stored [OAuthToken].
   Future<OAuthToken?> get token async {
     final credentialsJson = await _storage.fetchCredentials();
-    return credentialsJson != null ? OAuthToken.fromJson(credentialsJson) : null;
+    return credentialsJson != null
+        ? OAuthToken.fromJson(credentialsJson)
+        : null;
   }
 
   /// Provides an [OAuthInterceptor] instance.

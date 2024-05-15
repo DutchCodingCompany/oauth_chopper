@@ -13,7 +13,7 @@ import 'package:test/test.dart';
 
 class MockOAuthChopper extends Mock implements OAuthChopper {}
 
-class MockChain extends Mock implements Chain {}
+class MockChain extends Mock implements Chain<dynamic> {}
 
 void main() {
   final testRequest = Request(
@@ -21,7 +21,8 @@ void main() {
     Uri(host: 'test'),
     Uri(host: 'test'),
   );
-  final authorizedResponse = Response(http.Response('body', HttpStatus.accepted), 'body');
+  final authorizedResponse =
+      Response(http.Response('body', HttpStatus.accepted), 'body');
   registerFallbackValue(testRequest);
   registerFallbackValue(authorizedResponse);
 
@@ -46,7 +47,8 @@ void main() {
     );
 
     when(() => mockChain.request).thenReturn(testRequest);
-    when(() => mockChain.proceed(any())).thenAnswer((_) async => authorizedResponse);
+    when(() => mockChain.proceed(any()))
+        .thenAnswer((_) async => authorizedResponse);
 
     test('HeaderInterceptor adds available token to headers', () async {
       // arrange
@@ -58,10 +60,12 @@ void main() {
       await interceptor.intercept(mockChain);
 
       // assert
-      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected))).called(1);
+      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected)))
+          .called(1);
     });
 
-    test('HeaderInterceptor does not add IDToken when available to headers', () async {
+    test('HeaderInterceptor does not add IDToken when available to headers',
+        () async {
       // arrange
       when(() => mockOAuthChopper.token).thenAnswer((_) async => testIDtoken);
       final interceptor = OAuthInterceptor(mockOAuthChopper, null);
@@ -71,7 +75,8 @@ void main() {
       await interceptor.intercept(mockChain);
 
       // assert
-      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected))).called(1);
+      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected)))
+          .called(1);
     });
 
     test('HeaderInterceptor adds no token to headers', () async {
@@ -84,7 +89,8 @@ void main() {
       await interceptor.intercept(mockChain);
 
       // assert
-      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected))).called(1);
+      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected)))
+          .called(1);
     });
   });
 
@@ -98,10 +104,12 @@ void main() {
         expiration: DateTime(2022, 9, 1),
       ),
     );
-    final unauthorizedResponse = Response(http.Response('body', HttpStatus.unauthorized), 'body');
+    final unauthorizedResponse =
+        Response(http.Response('body', HttpStatus.unauthorized), 'body');
     setUp(() {
       when(() => mockChain.request).thenReturn(testRequest);
-      when(() => mockChain.proceed(any())).thenAnswer((_) async => unauthorizedResponse);
+      when(() => mockChain.proceed(any()))
+          .thenAnswer((_) async => unauthorizedResponse);
     });
 
     test('only refresh on unauthorized and token', () async {
@@ -116,12 +124,14 @@ void main() {
 
       // assert
       verify(mockOAuthChopper.refresh).called(1);
-      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected))).called(2);
+      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected)))
+          .called(2);
     });
 
     test("Don't refresh on authorized", () async {
       // arrange
-      when(() => mockChain.proceed(any())).thenAnswer((_) async => authorizedResponse);
+      when(() => mockChain.proceed(any()))
+          .thenAnswer((_) async => authorizedResponse);
       when(mockOAuthChopper.refresh).thenAnswer((_) async => testToken);
       when(() => mockOAuthChopper.token).thenAnswer((_) async => testToken);
       final interceptor = OAuthInterceptor(mockOAuthChopper, null);
@@ -186,7 +196,7 @@ void main() {
       );
 
       // act
-       await interceptor.intercept(mockChain);
+      await interceptor.intercept(mockChain);
 
       // assert
       expect(result?.message, 'failed');

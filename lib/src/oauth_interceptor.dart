@@ -29,7 +29,9 @@ class OAuthInterceptor implements Interceptor {
   final OAuthChopper oauthChopper;
 
   @override
-  FutureOr<Response<BodyType>> intercept<BodyType>(Chain<BodyType> chain) async {
+  FutureOr<Response<BodyType>> intercept<BodyType>(
+    Chain<BodyType> chain,
+  ) async {
     // Add oauth token to the request.
     final token = await oauthChopper.token;
 
@@ -48,7 +50,8 @@ class OAuthInterceptor implements Interceptor {
       try {
         final credentials = await oauthChopper.refresh();
         if (credentials != null) {
-          final request = chain.request.addAuthorizationHeader(credentials.accessToken);
+          final request =
+              chain.request.addAuthorizationHeader(credentials.accessToken);
           return chain.proceed(request);
         }
       } catch (e, s) {

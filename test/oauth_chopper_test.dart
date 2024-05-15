@@ -39,7 +39,6 @@ void main() {
     expect(oauthChopper, inteceptor.oauthChopper);
   });
 
-
   test('Returns token from storage', () async {
     // arrange
     when(storageMock.fetchCredentials).thenAnswer((_) => testJson);
