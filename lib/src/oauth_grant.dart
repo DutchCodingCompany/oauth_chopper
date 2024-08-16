@@ -11,6 +11,8 @@ import 'package:oauth2/oauth2.dart' as oauth;
 /// - [AuthorizationCodeGrant]
 ///
 /// {@endtemplate}
+// ignore because we need this interface.
+// ignore: one_member_abstracts
 abstract interface class OAuthGrant {
   /// {@macro oauth_grant}
   const OAuthGrant();
