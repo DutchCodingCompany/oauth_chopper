@@ -1,3 +1,14 @@
+## 1.1.0
+- Synced oauth_chopper with auth2 package. This makes more parameters available which are supported by oauth2.
+  - Be default `OAuthChopper` client can now also be provided with the following parameter. Which will be passed to oauth2.
+    - `scopes`
+    - `basicAuth`
+    - `delimiter`
+    - `getParameters`
+  - Added `newScopes` & `basicAuth` parameters to `OAuthChopper.refresh` which wil be passed to oauth2
+  - BREAKING: `scopes` has been removed from `AuthorizationCodeGrant`. These are now provided in the `OAuthChopper` client.
+  - BREAKING: `OAuthGrant.handle` has been extended to support new parameters as optional named parameters, `including` secret and `httpClient`.
+
 ## 1.0.1
 - Updated dependencies:
   - `sdk` to `>=3.4.0 <4.0.0`

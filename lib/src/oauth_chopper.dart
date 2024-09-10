@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:oauth_chopper/src/oauth_grant.dart';
 import 'package:oauth_chopper/src/oauth_interceptor.dart';
@@ -25,9 +26,13 @@ class OAuthChopper {
   OAuthChopper({
     required this.authorizationEndpoint,
     required this.identifier,
-    required this.secret,
+    this.secret,
     this.endSessionEndpoint,
     this.httpClient,
+    this.scopes,
+    this.basicAuth = true,
+    this.delimiter,
+    this.getParameters,
 
     /// OAuth storage for storing credentials.
     /// By default it will use a in memory storage [MemoryStorage].
@@ -46,7 +51,7 @@ class OAuthChopper {
   final String identifier;
 
   /// OAuth secret.
-  final String secret;
+  final String? secret;
 
   /// OAuth storage for storing credentials.
   /// By default it will use a in memory storage. For persisting the credentials
@@ -57,6 +62,23 @@ class OAuthChopper {
   /// Provide a custom [http.Client] which will be passed to [oauth2] and used
   /// for making new requests.
   final http.Client? httpClient;
+
+  /// The scopes that the client is requesting access to.
+  /// Will be passed to [oauth2].
+  final Iterable<String>? scopes;
+
+  /// Whether to use HTTP Basic authentication for authorizing the client.
+  /// Will be passed to [oauth2].
+  final bool basicAuth;
+
+  /// A [String] used to separate scopes; defaults to `" "`.
+  /// Will be passed to [oauth2].
+  final String? delimiter;
+
+  /// The function used to parse parameters from a host's response.
+  /// Will be passed to [oauth2].
+  final Map<String, dynamic> Function(MediaType? contentType, String body)?
+      getParameters;
 
   /// Get stored [OAuthToken].
   Future<OAuthToken?> get token async {
@@ -78,8 +100,13 @@ class OAuthChopper {
   /// instance.
   /// Throws an exception when refreshing fails. If the exception is a
   /// [oauth2.AuthorizationException] it clears the storage.
-  /// See [oauth2.Credentials.refresh]
-  Future<OAuthToken?> refresh() async {
+  ///
+  /// See [oauth2.Credentials.refresh] for more information
+  /// and information about [newScopes] and [basicAuth].
+  Future<OAuthToken?> refresh({
+    bool basicAuth = true,
+    Iterable<String>? newScopes,
+  }) async {
     final credentialsJson = await _storage.fetchCredentials();
     if (credentialsJson == null) return null;
     final credentials = oauth2.Credentials.fromJson(credentialsJson);
@@ -87,6 +114,8 @@ class OAuthChopper {
       final newCredentials = await credentials.refresh(
         identifier: identifier,
         secret: secret,
+        newScopes: newScopes,
+        basicAuth: basicAuth,
         httpClient: httpClient,
       );
       await _storage.saveCredentials(newCredentials.toJson());
@@ -109,8 +138,12 @@ class OAuthChopper {
     final credentials = await grant.handle(
       authorizationEndpoint,
       identifier,
-      secret,
-      httpClient,
+      secret: secret,
+      httpClient: httpClient,
+      scopes: scopes,
+      getParameters: getParameters,
+      delimiter: delimiter,
+      basicAuth: basicAuth,
     );
 
     await _storage.saveCredentials(credentials);

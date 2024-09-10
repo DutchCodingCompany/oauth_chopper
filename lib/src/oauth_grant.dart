@@ -1,5 +1,7 @@
 import 'package:http/http.dart' as http;
-import 'package:oauth2/oauth2.dart' as oauth;
+import 'package:http_parser/http_parser.dart';
+import 'package:oauth2/oauth2.dart' as oauth2;
+import 'package:oauth2/oauth2.dart';
 
 /// {@template oauth_grant}
 /// Interface for a OAuth grant.
@@ -20,10 +22,15 @@ abstract interface class OAuthGrant {
   /// Obtains credentials from an authorization server.
   Future<String> handle(
     Uri authorizationEndpoint,
-    String identifier,
-    String secret,
+    String identifier, {
+    String? secret,
     http.Client? httpClient,
-  );
+    Iterable<String>? scopes,
+    bool basicAuth = true,
+    String? delimiter,
+    Map<String, dynamic> Function(MediaType? contentType, String body)?
+        getParameters,
+  });
 }
 
 /// {@template resource_owner_password_grant}
@@ -37,6 +44,7 @@ class ResourceOwnerPasswordGrant implements OAuthGrant {
   const ResourceOwnerPasswordGrant({
     required this.username,
     required this.password,
+    this.onCredentialsRefreshed,
   });
 
   /// Username used for obtaining credentials.
@@ -45,20 +53,36 @@ class ResourceOwnerPasswordGrant implements OAuthGrant {
   /// Password used for obtaining credentials.
   final String password;
 
+  /// Callback to be invoked whenever the credentials are refreshed.
+  ///
+  /// This will be passed as-is to the constructed [Client].
+  /// Will be passed to [oauth2].
+  final CredentialsRefreshedCallback? onCredentialsRefreshed;
+
   @override
   Future<String> handle(
     Uri authorizationEndpoint,
-    String identifier,
-    String secret,
+    String identifier, {
+    String? secret,
     http.Client? httpClient,
-  ) async {
-    final client = await oauth.resourceOwnerPasswordGrant(
+    Iterable<String>? scopes,
+    bool basicAuth = true,
+    String? delimiter,
+    Map<String, dynamic> Function(MediaType? contentType, String body)?
+        getParameters,
+  }) async {
+    final client = await oauth2.resourceOwnerPasswordGrant(
       authorizationEndpoint,
       username,
       password,
       secret: secret,
       identifier: identifier,
+      scopes: scopes,
+      basicAuth: basicAuth,
+      delimiter: delimiter,
       httpClient: httpClient,
+      getParameters: getParameters,
+      onCredentialsRefreshed: onCredentialsRefreshed,
     );
     return client.credentials.toJson();
   }
@@ -74,15 +98,24 @@ class ClientCredentialsGrant implements OAuthGrant {
   @override
   Future<String> handle(
     Uri authorizationEndpoint,
-    String identifier,
-    String secret,
+    String identifier, {
+    String? secret,
     http.Client? httpClient,
-  ) async {
-    final client = await oauth.clientCredentialsGrant(
+    Iterable<String>? scopes,
+    bool basicAuth = true,
+    String? delimiter,
+    Map<String, dynamic> Function(MediaType? contentType, String body)?
+        getParameters,
+  }) async {
+    final client = await oauth2.clientCredentialsGrant(
       authorizationEndpoint,
       identifier,
       secret,
+      scopes: scopes,
+      basicAuth: basicAuth,
+      delimiter: delimiter,
       httpClient: httpClient,
+      getParameters: getParameters,
     );
     return client.credentials.toJson();
   }
@@ -95,10 +128,11 @@ class AuthorizationCodeGrant implements OAuthGrant {
   /// {@macro authorization_code_grant}
   const AuthorizationCodeGrant({
     required this.tokenEndpoint,
-    required this.scopes,
     required this.redirectUrl,
     required this.redirect,
     required this.listen,
+    this.onCredentialsRefreshed,
+    this.codeVerifier,
   });
 
   /// A URL provided by the authorization server that this library uses to
@@ -111,9 +145,16 @@ class AuthorizationCodeGrant implements OAuthGrant {
   /// The redirect URL where the resource owner will redirect to.
   final Uri redirectUrl;
 
-  /// The specific permissions being requested from the authorization server may
-  /// be specified via [scopes].
-  final List<String> scopes;
+  /// Callback to be invoked whenever the credentials are refreshed.
+  ///
+  /// This will be passed as-is to the constructed [Client].
+  /// Will be passed to [oauth2].
+  final CredentialsRefreshedCallback? onCredentialsRefreshed;
+
+  /// The PKCE code verifier. Will be generated if one is not provided in the
+  /// constructor.
+  /// Will be passed to [oauth2].
+  final String? codeVerifier;
 
   /// Callback used for redirect the authorizationUrl given by the authorization
   /// server.
@@ -125,15 +166,26 @@ class AuthorizationCodeGrant implements OAuthGrant {
   @override
   Future<String> handle(
     Uri authorizationEndpoint,
-    String identifier,
-    String secret,
+    String identifier, {
+    String? secret,
     http.Client? httpClient,
-  ) async {
-    final grant = oauth.AuthorizationCodeGrant(
+    Iterable<String>? scopes,
+    bool basicAuth = true,
+    String? delimiter,
+    Map<String, dynamic> Function(MediaType? contentType, String body)?
+        getParameters,
+  }) async {
+    final grant = oauth2.AuthorizationCodeGrant(
       identifier,
       authorizationEndpoint,
       tokenEndpoint,
+      basicAuth: basicAuth,
+      delimiter: delimiter,
+      getParameters: getParameters,
+      secret: secret,
       httpClient: httpClient,
+      onCredentialsRefreshed: onCredentialsRefreshed,
+      codeVerifier: codeVerifier,
     );
 
     final authorizationUrl = grant.getAuthorizationUrl(
