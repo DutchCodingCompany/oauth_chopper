@@ -1,6 +1,6 @@
 name: oauth_chopper
 description: Add and manage OAuth2 authentication for your Chopper client.
-version: 1.0.1
+version: 1.1.0
 homepage: https://github.com/DutchCodingCompany/oauth_chopper
 
 environment:
@@ -9,7 +9,8 @@ environment:
 dependencies:
   chopper: ^8.0.1+1
   http: ^1.2.2
-  oauth2: ^2.0.2
+  http_parser: ^4.1.0
+  oauth2: ^2.0.3
 
 dev_dependencies:
   mocktail: ^1.0.4

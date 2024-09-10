@@ -78,8 +78,18 @@ void main() {
   test('Successful grant is stored', () async {
     // arrange
     when(() => storageMock.saveCredentials(any())).thenAnswer((_) => null);
-    when(() => grantMock.handle(any(), any(), any(), null))
-        .thenAnswer((_) async => testJson);
+    when(
+      () => grantMock.handle(
+        any(),
+        any(),
+        secret: any(named: 'secret'),
+        basicAuth: any(named: 'basicAuth'),
+        httpClient: any(named: 'httpClient'),
+        delimiter: any(named: 'delimiter'),
+        getParameters: any(named: 'getParameters'),
+        scopes: any(named: 'scopes'),
+      ),
+    ).thenAnswer((_) async => testJson);
     final oauthChopper = OAuthChopper(
       authorizationEndpoint: Uri.parse('endpoint'),
       identifier: 'identifier',
@@ -91,7 +101,7 @@ void main() {
     final token = await oauthChopper.requestGrant(grantMock);
 
     // assert
-    verify(() => grantMock.handle(any(), 'identifier', 'secret', null))
+    verify(() => grantMock.handle(any(), 'identifier', secret: 'secret'))
         .called(1);
     verify(() => storageMock.saveCredentials(testJson)).called(1);
     expect(token.accessToken, 'accesToken');
