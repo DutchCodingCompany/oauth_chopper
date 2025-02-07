@@ -1,7 +1,7 @@
 /// OAuthChopper for configuring OAuth authentication with Chopper.
 ///
 /// More dartdocs go here.
-library oauth_chopper;
+library;
 
 export 'package:oauth2/src/authorization_exception.dart';
 export 'package:oauth2/src/expiration_exception.dart';
