@@ -1,7 +1,6 @@
 ## 1.1.1
 - Updated dependencies:
   - `sdk` to `^3.6.1`
-  - `flutter` to `>=3.27.0`
   - `chopper` to `8.0.4`
   - `http` to `1.3.0`
   - `http_parser` to `4.1.2`
