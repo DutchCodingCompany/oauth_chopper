@@ -1,3 +1,12 @@
+## 1.1.1
+- Updated dependencies:
+  - `sdk` to `^3.6.1`
+  - `chopper` to `8.0.4`
+  - `http` to `1.3.0`
+  - `http_parser` to `4.1.2`
+  - `test` to `1.25.14`
+  - `very_good_analysis` to `7.0.0`
+
 ## 1.1.0
 - Synced oauth_chopper with auth2 package. This makes more parameters available which are supported by oauth2.
   - Be default `OAuthChopper` client can now also be provided with the following parameter. Which will be passed to oauth2.
