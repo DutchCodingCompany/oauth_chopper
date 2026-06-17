@@ -1,8 +1,10 @@
+import 'package:meta/meta.dart';
 import 'package:oauth2/oauth2.dart';
 
 /// {@template oauth_token}
 /// A wrapper around [Credentials] to provide a more convenient API.
 /// {@endtemplate}
+@immutable
 class OAuthToken {
   /// {@macro oauth_token}
   const OAuthToken._(
@@ -22,11 +24,11 @@ class OAuthToken {
   /// Creates a new instance of [OAuthToken] from [Credentials].
   /// {@macro oauth_token}
   factory OAuthToken.fromCredentials(Credentials credentials) => OAuthToken._(
-        credentials.accessToken,
-        credentials.refreshToken,
-        credentials.expiration,
-        credentials.idToken,
-      );
+    credentials.accessToken,
+    credentials.refreshToken,
+    credentials.expiration,
+    credentials.idToken,
+  );
 
   /// The token that is sent to the resource server to prove the authorization
   /// of a client.
@@ -56,8 +58,27 @@ class OAuthToken {
 
   /// Whether the token is expired.
   bool get isExpired =>
-      expiration != null &&
-      DateTime.now().isAfter(
-        expiration!,
-      );
+      expiration != null && DateTime.now().isAfter(expiration!);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is OAuthToken &&
+          runtimeType == other.runtimeType &&
+          accessToken == other.accessToken &&
+          refreshToken == other.refreshToken &&
+          expiration == other.expiration &&
+          idToken == other.idToken;
+
+  @override
+  int get hashCode =>
+      Object.hash(accessToken, refreshToken, expiration, idToken);
+
+  @override
+  String toString() =>
+      'OAuthToken('
+      'accessToken: $accessToken, '
+      'refreshToken: $refreshToken, '
+      'expiration: $expiration, '
+      'idToken: $idToken)';
 }

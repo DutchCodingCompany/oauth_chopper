@@ -1,3 +1,14 @@
+## 1.2.0
+- Added concurrent refresh protection: multiple simultaneous 401 responses now share a single refresh call instead of issuing redundant refresh requests.
+- Added proactive token refresh: the interceptor now checks `OAuthToken.isExpired` before making the request and refreshes preemptively, avoiding unnecessary 401 round-trips.
+- Added `==`, `hashCode`, and `toString()` to `OAuthToken` for value-based equality and easier debugging.
+- Exported `OnErrorCallback` and `MemoryStorage`
+- Fixed exports for `oauth2` package
+- Updated dependencies:
+  - `sdk` to `^3.7.0`
+  - `meta` added
+  - `very_good_analysis` to `10.2.0`
+
 ## 1.1.1
 - Updated dependencies:
   - `sdk` to `^3.6.1`

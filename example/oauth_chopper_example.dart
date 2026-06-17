@@ -5,7 +5,7 @@
 import 'package:chopper/chopper.dart';
 import 'package:oauth_chopper/oauth_chopper.dart';
 
-void main() {
+Future<void> main() async {
   final authorizationEndpoint = Uri.parse('https://example.com/oauth');
   final identifier = 'id';
   final secret = 'secret';
@@ -20,16 +20,11 @@ void main() {
   /// Add the oauth_chopper interceptor to the chopper client.
   final chopperClient = ChopperClient(
     baseUrl: Uri.parse('https://example.com'),
-    interceptors: [
-      oauthChopper.interceptor(),
-    ],
+    interceptors: [oauthChopper.interceptor()],
   );
 
   /// Request grant
-  oauthChopper.requestGrant(
-    ResourceOwnerPasswordGrant(
-      username: 'username',
-      password: 'password',
-    ),
+  await oauthChopper.requestGrant(
+    ResourceOwnerPasswordGrant(username: 'username', password: 'password'),
   );
 }

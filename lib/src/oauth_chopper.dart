@@ -78,7 +78,12 @@ class OAuthChopper {
   /// The function used to parse parameters from a host's response.
   /// Will be passed to [oauth2].
   final Map<String, dynamic> Function(MediaType? contentType, String body)?
-      getParameters;
+  getParameters;
+
+  /// Tracks the in-flight refresh operation to prevent concurrent refresh
+  /// attempts. When multiple requests receive a 401 simultaneously, they
+  /// all await the same [Completer] rather than issuing separate refresh calls.
+  Completer<OAuthToken?>? _refreshCompleter;
 
   /// Get stored [OAuthToken].
   Future<OAuthToken?> get token async {
@@ -91,13 +96,15 @@ class OAuthChopper {
   /// Provides an [OAuthInterceptor] instance.
   /// If [onError] is provided exceptions will be passed to [onError] and not be
   /// thrown.
-  OAuthInterceptor interceptor({
-    OnErrorCallback? onError,
-  }) =>
+  OAuthInterceptor interceptor({OnErrorCallback? onError}) =>
       OAuthInterceptor(this, onError);
 
   /// Tries to refresh the available credentials and returns a new [OAuthToken]
   /// instance.
+  ///
+  /// If a refresh is already in-flight, subsequent callers will await the same
+  /// result rather than issuing concurrent refresh requests.
+  ///
   /// Throws an exception when refreshing fails. If the exception is a
   /// [oauth2.AuthorizationException] it clears the storage.
   ///
@@ -105,6 +112,33 @@ class OAuthChopper {
   /// and information about [newScopes] and [basicAuth].
   Future<OAuthToken?> refresh({
     bool basicAuth = true,
+    Iterable<String>? newScopes,
+  }) async {
+    // If a refresh is already in-flight, await the existing operation.
+    if (_refreshCompleter != null) {
+      return _refreshCompleter!.future;
+    }
+
+    _refreshCompleter = Completer<OAuthToken?>();
+
+    try {
+      final result = await _performRefresh(
+        basicAuth: basicAuth,
+        newScopes: newScopes,
+      );
+      _refreshCompleter!.complete(result);
+      return result;
+    } catch (e, s) {
+      _refreshCompleter!.completeError(e, s);
+      rethrow;
+    } finally {
+      _refreshCompleter = null;
+    }
+  }
+
+  /// Internal method that performs the actual credential refresh.
+  Future<OAuthToken?> _performRefresh({
+    required bool basicAuth,
     Iterable<String>? newScopes,
   }) async {
     final credentialsJson = await _storage.fetchCredentials();
@@ -121,7 +155,7 @@ class OAuthChopper {
       await _storage.saveCredentials(newCredentials.toJson());
       return OAuthToken.fromCredentials(newCredentials);
     } on oauth2.AuthorizationException {
-      _storage.clear();
+      await _storage.clear();
       rethrow;
     }
   }

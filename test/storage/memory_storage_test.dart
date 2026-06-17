@@ -1,13 +1,13 @@
-import 'package:oauth_chopper/src/storage/memory_storage.dart';
+import 'package:oauth_chopper/oauth_chopper.dart';
 import 'package:test/test.dart';
 
 void main() {
   test('Store & read a value', () async {
     // arrange
-    final storage = MemoryStorage()
-
-      // act
-      ..saveCredentials('test');
+    final storage =
+        MemoryStorage()
+          // act
+          ..saveCredentials('test');
     final result = await storage.fetchCredentials();
 
     // assert
@@ -16,10 +16,10 @@ void main() {
 
   test('Store, update & read a value', () async {
     // arrange
-    final storage = MemoryStorage()
-
-      // act
-      ..saveCredentials('test');
+    final storage =
+        MemoryStorage()
+          // act
+          ..saveCredentials('test');
     final result1 = await storage.fetchCredentials();
     storage.saveCredentials('test2');
     final result2 = await storage.fetchCredentials();
@@ -31,10 +31,10 @@ void main() {
 
   test('Store, clear, store & read a value', () async {
     // arrange
-    final storage = MemoryStorage()
-
-      // act
-      ..saveCredentials('test');
+    final storage =
+        MemoryStorage()
+          // act
+          ..saveCredentials('test');
     await storage.clear();
     storage.saveCredentials('test2');
     final result = await storage.fetchCredentials();
@@ -45,10 +45,10 @@ void main() {
 
   test('Store, clear & read a value', () async {
     // arrange
-    final storage = MemoryStorage()
-
-      // act
-      ..saveCredentials('test');
+    final storage =
+        MemoryStorage()
+          // act
+          ..saveCredentials('test');
     await storage.clear();
     final result = await storage.fetchCredentials();
 
