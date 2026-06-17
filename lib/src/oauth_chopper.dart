@@ -113,7 +113,7 @@ class OAuthChopper {
   Future<OAuthToken?> refresh({
     bool basicAuth = true,
     Iterable<String>? newScopes,
-  }) async {
+  }) {
     // If a refresh is already in-flight, await the existing operation.
     if (_refreshCompleter != null) {
       return _refreshCompleter!.future;
@@ -121,19 +121,20 @@ class OAuthChopper {
 
     _refreshCompleter = Completer<OAuthToken?>();
 
-    try {
-      final result = await _performRefresh(
-        basicAuth: basicAuth,
-        newScopes: newScopes,
-      );
-      _refreshCompleter!.complete(result);
-      return result;
-    } catch (e, s) {
-      _refreshCompleter!.completeError(e, s);
-      rethrow;
-    } finally {
-      _refreshCompleter = null;
-    }
+    unawaited(
+      _performRefresh(basicAuth: basicAuth, newScopes: newScopes).then(
+        (result) {
+          _refreshCompleter!.complete(result);
+          _refreshCompleter = null;
+        },
+        onError: (Object e, StackTrace s) {
+          _refreshCompleter!.completeError(e, s);
+          _refreshCompleter = null;
+        },
+      ),
+    );
+
+    return _refreshCompleter!.future;
   }
 
   /// Internal method that performs the actual credential refresh.
