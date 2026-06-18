@@ -4,6 +4,7 @@
 - Added `==`, `hashCode`, and `toString()` to `OAuthToken` for value-based equality and easier debugging.
 - Exported `OnErrorCallback` and `MemoryStorage`
 - Fixed exports for `oauth2` package
+- Added skills for: setup and storage
 - Updated dependencies:
   - `sdk` to `^3.7.0`
   - `meta` added
