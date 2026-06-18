@@ -29,7 +29,7 @@ abstract interface class OAuthGrant {
     bool basicAuth = true,
     String? delimiter,
     Map<String, dynamic> Function(MediaType? contentType, String body)?
-        getParameters,
+    getParameters,
   });
 }
 
@@ -69,7 +69,7 @@ class ResourceOwnerPasswordGrant implements OAuthGrant {
     bool basicAuth = true,
     String? delimiter,
     Map<String, dynamic> Function(MediaType? contentType, String body)?
-        getParameters,
+    getParameters,
   }) async {
     final client = await oauth2.resourceOwnerPasswordGrant(
       authorizationEndpoint,
@@ -105,7 +105,7 @@ class ClientCredentialsGrant implements OAuthGrant {
     bool basicAuth = true,
     String? delimiter,
     Map<String, dynamic> Function(MediaType? contentType, String body)?
-        getParameters,
+    getParameters,
   }) async {
     final client = await oauth2.clientCredentialsGrant(
       authorizationEndpoint,
@@ -173,7 +173,7 @@ class AuthorizationCodeGrant implements OAuthGrant {
     bool basicAuth = true,
     String? delimiter,
     Map<String, dynamic> Function(MediaType? contentType, String body)?
-        getParameters,
+    getParameters,
   }) async {
     final grant = oauth2.AuthorizationCodeGrant(
       identifier,

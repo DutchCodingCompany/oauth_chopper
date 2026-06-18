@@ -15,7 +15,7 @@ void main() {
   final grantMock = MockOAuthGrant();
   const testJson = '''
    {
- 	"accessToken": "accesToken",
+ 	"accessToken": "accessToken",
  	"refreshToken": "refreshToken",
  	"idToken": "idToken",
  	"tokenEndpoint": "https://test.test/oauth/token",
@@ -53,7 +53,7 @@ void main() {
     final token = await oauthChopper.token;
 
     // assert
-    expect(token?.accessToken, 'accesToken');
+    expect(token?.accessToken, 'accessToken');
     expect(token?.refreshToken, 'refreshToken');
     expect(token?.idToken, 'idToken');
   });
@@ -101,10 +101,11 @@ void main() {
     final token = await oauthChopper.requestGrant(grantMock);
 
     // assert
-    verify(() => grantMock.handle(any(), 'identifier', secret: 'secret'))
-        .called(1);
+    verify(
+      () => grantMock.handle(any(), 'identifier', secret: 'secret'),
+    ).called(1);
     verify(() => storageMock.saveCredentials(testJson)).called(1);
-    expect(token.accessToken, 'accesToken');
+    expect(token.accessToken, 'accessToken');
     expect(token.idToken, 'idToken');
     expect(token.refreshToken, 'refreshToken');
   });

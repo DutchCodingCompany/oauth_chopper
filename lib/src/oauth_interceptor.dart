@@ -14,7 +14,8 @@ typedef OnErrorCallback = void Function(Object, StackTrace);
 /// available no header is added.
 /// Its added as a Bearer token.
 ///
-/// When the provided credentials are invalid it tries to refresh them.
+/// When the token is expired it tries to proactively refresh before making the
+/// request. When the server responds with 401 it also tries to refresh once.
 /// Can throw a exceptions if no [onError] is passed. When [onError] is passed
 /// exception will be passed to [onError]
 /// {@endtemplate}
@@ -32,9 +33,26 @@ class OAuthInterceptor implements Interceptor {
   FutureOr<Response<BodyType>> intercept<BodyType>(
     Chain<BodyType> chain,
   ) async {
-    // Add oauth token to the request.
-    final token = await oauthChopper.token;
+    // Get the current token.
+    var token = await oauthChopper.token;
 
+    // If the token is expired, proactively refresh before making the request.
+    if (token != null && token.isExpired) {
+      try {
+        final refreshed = await oauthChopper.refresh();
+        if (refreshed != null) {
+          token = refreshed;
+        }
+      } catch (e, s) {
+        if (onError != null) {
+          onError!(e, s);
+        } else {
+          rethrow;
+        }
+      }
+    }
+
+    // Add oauth token to the request.
     final Request request;
     if (token == null) {
       request = chain.request;
@@ -50,13 +68,14 @@ class OAuthInterceptor implements Interceptor {
       try {
         final credentials = await oauthChopper.refresh();
         if (credentials != null) {
-          final request =
-              chain.request.addAuthorizationHeader(credentials.accessToken);
-          return chain.proceed(request);
+          final retryRequest = chain.request.addAuthorizationHeader(
+            credentials.accessToken,
+          );
+          return chain.proceed(retryRequest);
         }
       } catch (e, s) {
         if (onError != null) {
-          onError?.call(e, s);
+          onError!(e, s);
         } else {
           rethrow;
         }

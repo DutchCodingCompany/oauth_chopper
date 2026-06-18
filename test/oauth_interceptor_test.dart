@@ -16,13 +16,11 @@ class MockOAuthChopper extends Mock implements OAuthChopper {}
 class MockChain extends Mock implements Chain<dynamic> {}
 
 void main() {
-  final testRequest = Request(
-    'GET',
-    Uri(host: 'test'),
-    Uri(host: 'test'),
+  final testRequest = Request('GET', Uri(host: 'test'), Uri(host: 'test'));
+  final authorizedResponse = Response(
+    http.Response('body', HttpStatus.accepted),
+    'body',
   );
-  final authorizedResponse =
-      Response(http.Response('body', HttpStatus.accepted), 'body');
   registerFallbackValue(testRequest);
   registerFallbackValue(authorizedResponse);
 
@@ -33,7 +31,7 @@ void main() {
       Credentials(
         'token',
         refreshToken: 'refresh',
-        expiration: DateTime(2022, 9, 1),
+        expiration: DateTime.now().add(const Duration(hours: 1)),
       ),
     );
 
@@ -42,13 +40,14 @@ void main() {
         'token',
         refreshToken: 'refresh',
         idToken: 'idToken',
-        expiration: DateTime(2022, 9, 1),
+        expiration: DateTime.now().add(const Duration(hours: 1)),
       ),
     );
 
     when(() => mockChain.request).thenReturn(testRequest);
-    when(() => mockChain.proceed(any()))
-        .thenAnswer((_) async => authorizedResponse);
+    when(
+      () => mockChain.proceed(any()),
+    ).thenAnswer((_) async => authorizedResponse);
 
     test('HeaderInterceptor adds available token to headers', () async {
       // arrange
@@ -60,24 +59,28 @@ void main() {
       await interceptor.intercept(mockChain);
 
       // assert
-      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected)))
-          .called(1);
+      verify(
+        () => mockChain.proceed(testRequest.copyWith(headers: expected)),
+      ).called(1);
     });
 
-    test('HeaderInterceptor does not add IDToken when available to headers',
-        () async {
-      // arrange
-      when(() => mockOAuthChopper.token).thenAnswer((_) async => testIDtoken);
-      final interceptor = OAuthInterceptor(mockOAuthChopper, null);
-      final expected = {'Authorization': 'Bearer token'};
+    test(
+      'HeaderInterceptor does not add IDToken when available to headers',
+      () async {
+        // arrange
+        when(() => mockOAuthChopper.token).thenAnswer((_) async => testIDtoken);
+        final interceptor = OAuthInterceptor(mockOAuthChopper, null);
+        final expected = {'Authorization': 'Bearer token'};
 
-      // act
-      await interceptor.intercept(mockChain);
+        // act
+        await interceptor.intercept(mockChain);
 
-      // assert
-      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected)))
-          .called(1);
-    });
+        // assert
+        verify(
+          () => mockChain.proceed(testRequest.copyWith(headers: expected)),
+        ).called(1);
+      },
+    );
 
     test('HeaderInterceptor adds no token to headers', () async {
       // arrange
@@ -89,8 +92,104 @@ void main() {
       await interceptor.intercept(mockChain);
 
       // assert
-      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected)))
-          .called(1);
+      verify(
+        () => mockChain.proceed(testRequest.copyWith(headers: expected)),
+      ).called(1);
+    });
+  });
+
+  group('proactive refresh tests', () {
+    final mockChain = MockChain();
+    final mockOAuthChopper = MockOAuthChopper();
+    final expiredToken = OAuthToken.fromCredentials(
+      Credentials(
+        'expired_token',
+        refreshToken: 'refresh',
+        expiration: DateTime(2022, 9, 1),
+      ),
+    );
+
+    final freshToken = OAuthToken.fromCredentials(
+      Credentials(
+        'fresh_token',
+        refreshToken: 'refresh',
+        expiration: DateTime.now().add(const Duration(hours: 1)),
+      ),
+    );
+
+    setUp(() {
+      when(() => mockChain.request).thenReturn(testRequest);
+      when(
+        () => mockChain.proceed(any()),
+      ).thenAnswer((_) async => authorizedResponse);
+    });
+
+    test('Proactively refreshes expired token before request', () async {
+      // arrange
+      when(() => mockOAuthChopper.token).thenAnswer((_) async => expiredToken);
+      when(mockOAuthChopper.refresh).thenAnswer((_) async => freshToken);
+      final interceptor = OAuthInterceptor(mockOAuthChopper, null);
+      final expected = {'Authorization': 'Bearer fresh_token'};
+
+      // act
+      await interceptor.intercept(mockChain);
+
+      // assert
+      verify(mockOAuthChopper.refresh).called(1);
+      verify(
+        () => mockChain.proceed(testRequest.copyWith(headers: expected)),
+      ).called(1);
+    });
+
+    test('Uses original token if proactive refresh returns null', () async {
+      // arrange
+      when(() => mockOAuthChopper.token).thenAnswer((_) async => expiredToken);
+      when(mockOAuthChopper.refresh).thenAnswer((_) async => null);
+      final interceptor = OAuthInterceptor(mockOAuthChopper, null);
+      final expected = {'Authorization': 'Bearer expired_token'};
+
+      // act
+      await interceptor.intercept(mockChain);
+
+      // assert
+      verify(mockOAuthChopper.refresh).called(1);
+      verify(
+        () => mockChain.proceed(testRequest.copyWith(headers: expected)),
+      ).called(1);
+    });
+
+    test('Calls onError when proactive refresh throws', () async {
+      // arrange
+      FormatException? result;
+      when(() => mockOAuthChopper.token).thenAnswer((_) async => expiredToken);
+      when(
+        mockOAuthChopper.refresh,
+      ).thenThrow(const FormatException('refresh failed'));
+      final interceptor = OAuthInterceptor(
+        mockOAuthChopper,
+        (e, s) => result = e as FormatException,
+      );
+
+      // act
+      await interceptor.intercept(mockChain);
+
+      // assert
+      expect(result?.message, 'refresh failed');
+    });
+
+    test('Throws when proactive refresh fails and onError is null', () async {
+      // arrange
+      when(() => mockOAuthChopper.token).thenAnswer((_) async => expiredToken);
+      when(
+        mockOAuthChopper.refresh,
+      ).thenThrow(const FormatException('refresh failed'));
+      final interceptor = OAuthInterceptor(mockOAuthChopper, null);
+
+      // act & assert
+      expect(
+        () async => interceptor.intercept(mockChain),
+        throwsFormatException,
+      );
     });
   });
 
@@ -101,15 +200,18 @@ void main() {
       Credentials(
         'token',
         refreshToken: 'refresh',
-        expiration: DateTime(2022, 9, 1),
+        expiration: DateTime.now().add(const Duration(hours: 1)),
       ),
     );
-    final unauthorizedResponse =
-        Response(http.Response('body', HttpStatus.unauthorized), 'body');
+    final unauthorizedResponse = Response(
+      http.Response('body', HttpStatus.unauthorized),
+      'body',
+    );
     setUp(() {
       when(() => mockChain.request).thenReturn(testRequest);
-      when(() => mockChain.proceed(any()))
-          .thenAnswer((_) async => unauthorizedResponse);
+      when(
+        () => mockChain.proceed(any()),
+      ).thenAnswer((_) async => unauthorizedResponse);
     });
 
     test('only refresh on unauthorized and token', () async {
@@ -124,14 +226,16 @@ void main() {
 
       // assert
       verify(mockOAuthChopper.refresh).called(1);
-      verify(() => mockChain.proceed(testRequest.copyWith(headers: expected)))
-          .called(2);
+      verify(
+        () => mockChain.proceed(testRequest.copyWith(headers: expected)),
+      ).called(2);
     });
 
     test("Don't refresh on authorized", () async {
       // arrange
-      when(() => mockChain.proceed(any()))
-          .thenAnswer((_) async => authorizedResponse);
+      when(
+        () => mockChain.proceed(any()),
+      ).thenAnswer((_) async => authorizedResponse);
       when(mockOAuthChopper.refresh).thenAnswer((_) async => testToken);
       when(() => mockOAuthChopper.token).thenAnswer((_) async => testToken);
       final interceptor = OAuthInterceptor(mockOAuthChopper, null);
@@ -180,7 +284,7 @@ void main() {
       // act
       // assert
       expect(
-        () async => await interceptor.intercept(mockChain),
+        () async => interceptor.intercept(mockChain),
         throwsFormatException,
       );
     });
